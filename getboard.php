@@ -26,14 +26,14 @@
 			"volume": 1
 		},
 		{
-			"label": "",
-			"src": "",
-			"trackStart": 0,
-			"fadeIn": 0,
+			"label": "Somebody That I Used To Know",
+			"src": "know.mp3",
+			"trackStart": 5,
+			"fadeIn": 1,
 			"background": false,
-			"loop": false,
-			"loopStart": 0,
-			"loopEnd": 0,
+			"loop": true,
+			"loopStart": 50,
+			"loopEnd": 240,
 			"volume": 1.0
 		},
 		{
@@ -45,7 +45,9 @@
 			"loop": false,
 			"loopStart": 0,
 			"loopEnd": 0,
-			"volume": 1.0
+			"volume": 1.0,
+			"goTo": 0,
+			"goToDelay": 0
 		},
 		{
 			"label": "Right",
@@ -56,7 +58,9 @@
 			"loop": false,
 			"loopStart": 0,
 			"loopEnd": 0,
-			"volume": 1.0
+			"volume": 1.0,
+			"goTo": 1,
+			"goToDelay": 3
 		},
 		{
 			"label": "Right",
@@ -67,7 +71,9 @@
 			"loop": false,
 			"loopStart": 0,
 			"loopEnd": 0,
-			"volume": 1.0
+			"volume": 1.0,
+			"goTo": 2,
+			"goToDelay": 3
 		},
 		{
 			"label": "Wrong",

@@ -2,12 +2,14 @@
 TODO:
 
 Implement UI for displaying play status per bumper
+--Different colors/indicators for background and looping tracks
 
 Implement editing bumper
-Implement loading board from database
+Implement loading board from localStorage database
+--should a board-sharing feature be implemented? Would need a way of transferring tracks, too. 
 Implement creating new board
 
-Implement "Go To" functionality where you can specify a bumper to jump to after the current one finishes (with optional delay)
+Implement goToDelay option
 
 Implement as Chrome App (with offline support)
 
@@ -80,6 +82,10 @@ function BoardCtrl($scope, $http) {
 	};
 	
 	$scope.startTrack = function(b) {
+		if(typeof b == "number") {
+			b = $scope.board.bumpers[b];
+		}
+		
 		if(b.src !== '') {
 			if(!b.playing) {
 				var i;
@@ -154,8 +160,12 @@ function BoardCtrl($scope, $http) {
 				var b = $scope.board.bumpers[i];
 				if(b.audioSource && b.audioSource.playbackState === 3) {
 					angular.element(document.body).scope().$apply("stop(" + i + ")");
+					
+					if(typeof b.goTo !== "undefined" && b.goTo !== -1) {
+						angular.element(document.body).scope().$apply("startTrack(" + b.goTo + ")");
+					}
 				}
 			}
 		}
-	}, 200);
+	}, 100);
 }

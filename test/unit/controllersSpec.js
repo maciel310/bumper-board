@@ -3,8 +3,6 @@
 /* jasmine specs for controllers go here */
 
 describe('BoardCtrl', function(){
-	var boardCtrl;
-	
 	var scope, ctrl, $httpBackend;
 	
 	beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
@@ -40,12 +38,8 @@ describe('BoardCtrl', function(){
 		});
 		
 		scope = $rootScope.$new();
-		ctrl = $controller(PhoneListCtrl, {$scope: scope});
+		ctrl = $controller(BoardCtrl, {$scope: scope});
 	}));
-	
-	beforeEach(function(){
-		boardCtrl = new BoardCtrl();
-	});
 	
 	
 	it('should ....', function() {

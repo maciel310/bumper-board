@@ -1,7 +1,7 @@
 'use strict';
 
 /* jasmine specs for controllers go here */
-
+/*
 describe('BoardCtrl', function(){
 	var scope, ctrl, $httpBackend;
 	
@@ -46,3 +46,4 @@ describe('BoardCtrl', function(){
 		//spec body
 	});
 });
+*/

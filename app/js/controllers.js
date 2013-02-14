@@ -37,14 +37,6 @@ function BoardCtrl($scope, $http) {
 		}
 	}
 	
-	$(function() {
-		$('#board').height($(window).height() - $('#controls').height() - 50);
-	});
-	
-	$(window).resize(function() {
-		$('#board').height($(window).height() - $('#controls').height() - 50);
-	});
-	
 	$scope.getBumperFile = function(i) {
 		var req = new XMLHttpRequest();
 		req.open('GET', $scope.board.bumpers[i].src, true);

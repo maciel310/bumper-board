@@ -15,3 +15,13 @@
 		Loading...
 	</div>
 </div>
+
+<script>
+$(function() {
+	$('#board').height($(window).height() - $('#controls').height() - 50);
+});
+
+$(window).resize(function() {
+	$('#board').height($(window).height() - $('#controls').height() - 50);
+});
+</script>

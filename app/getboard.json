@@ -5,7 +5,7 @@
 	"bumpers": [
 		{
 			"label": "Somebody That I Used To Know",
-			"src": "know.mp3",
+			"src": "/bumper-board/know.mp3",
 			"trackStart": 5,
 			"fadeIn": 1,
 			"background": true,
@@ -16,7 +16,7 @@
 		},
 		{
 			"label": "Already Gone",
-			"src": "gone.mp3",
+			"src": "/bumper-board/gone.mp3",
 			"trackStart": 11,
 			"fadeIn": 5,
 			"background": true,
@@ -27,7 +27,7 @@
 		},
 		{
 			"label": "Somebody That I Used To Know",
-			"src": "know.mp3",
+			"src": "/bumper-board/know.mp3",
 			"trackStart": 5,
 			"fadeIn": 1,
 			"background": false,
@@ -38,7 +38,7 @@
 		},
 		{
 			"label": "Right",
-			"src": "Right.mp3",
+			"src": "/bumper-board/Right.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,
@@ -51,7 +51,7 @@
 		},
 		{
 			"label": "Right",
-			"src": "Right.mp3",
+			"src": "/bumper-board/Right.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,
@@ -64,7 +64,7 @@
 		},
 		{
 			"label": "Right",
-			"src": "Right.mp3",
+			"src": "/bumper-board/Right.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,
@@ -77,7 +77,7 @@
 		},
 		{
 			"label": "Wrong",
-			"src": "Wrong.mp3",
+			"src": "/bumper-board/Wrong.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,
@@ -88,7 +88,7 @@
 		},
 		{
 			"label": "Wrong",
-			"src": "Wrong.mp3",
+			"src": "/bumper-board/Wrong.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,
@@ -99,7 +99,7 @@
 		},
 		{
 			"label": "Wrong",
-			"src": "Wrong.mp3",
+			"src": "/bumper-board/Wrong.mp3",
 			"trackStart": 0,
 			"fadeIn": 0,
 			"background": false,

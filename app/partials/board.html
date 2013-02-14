@@ -1,0 +1,17 @@
+<div id='controls'>
+	<h2>{{board.title}}&nbsp;</h2>
+</div>
+
+<div id='board'>
+	<div ng-repeat="bumper in board.bumpers" ng-click='startTrack(bumper)' class='bumper playing-{{bumper.playing}}' 
+			style='width:{{95/board.cols | number:0}}%; height:{{95/board.rows | number:0}}%'>
+		{{bumper.label}}
+	</div>
+</div>
+
+
+<div id='loading-overlay' ng-hide='bumpersLoaded'>
+	<div>
+		Loading...
+	</div>
+</div>

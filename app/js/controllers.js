@@ -20,22 +20,15 @@ function BoardCtrl($scope, $http) {
 	
 	$scope.bumpersLoaded = false;
 	
-	$http.get('getboard.json').success(function(d) {
-		$scope.board = d;
-		
+	$scope.loadBumperSources = function() {
 		if(!$scope.bumpersLoaded) {
-			loadBumperSources();
-		}
-	});
-	
-	
-	function loadBumperSources() {
-		for(var i in $scope.board.bumpers) {
-			if($scope.board.bumpers[i].src !== '') {
-				$scope.getBumperFile(i);
+			for(var i in $scope.board.bumpers) {
+				if($scope.board.bumpers[i].src !== '') {
+					$scope.getBumperFile(i);
+				}
 			}
 		}
-	}
+	};
 	
 	$scope.getBumperFile = function(i) {
 		var req = new XMLHttpRequest();
@@ -160,4 +153,20 @@ function BoardCtrl($scope, $http) {
 			}
 		}
 	}, 100);
+
+
+
+	if(localStorage.boards === "" || typeof localStorage.boards === "undefined") {
+		$http.get('defaultboard.json').success(function(d) {
+			$scope.board = d;
+			
+			localStorage.boards = JSON.stringify([d]);
+			
+			$scope.loadBumperSources();
+		});
+	} else {
+		$scope.board = JSON.parse(localStorage.boards)[0];
+		
+		$scope.loadBumperSources();
+	}
 }

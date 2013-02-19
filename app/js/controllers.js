@@ -5,20 +5,37 @@ Implement UI for displaying play status per bumper
 --Different colors/indicators for background and looping tracks
 
 Implement editing bumper
-Implement loading board from localStorage database
---should a board-sharing feature be implemented? Would need a way of transferring tracks, too. 
 Implement creating new board
 
 Implement goToDelay option
 
 Implement as Chrome App (with offline support)
 
+Should a board-sharing feature be implemented? Would need a way of transferring tracks, too, once local loading is implemented
+--could possibly use cloud storage APIs (dropbox, Google Drive, etc)
 */
 
 function BoardCtrl($scope, $http) {
 	var audioContext = new webkitAudioContext();
 	
 	$scope.bumpersLoaded = false;
+	$scope.showBoardSelectUI = false;
+	
+	$scope.selectBoard = function() {
+		$scope.showBoardSelectUI = true;
+	};
+	
+	$scope.changeBoard = function(i) {
+		if($scope.board != $scope.boards[i]) {
+			$scope.stopAll();
+			
+			$scope.bumpersLoaded = false;
+			$scope.board = $scope.boards[i];
+			$scope.loadBumperSources();
+		}
+		
+		$scope.showBoardSelectUI = false;
+	};
 	
 	$scope.loadBumperSources = function() {
 		if(!$scope.bumpersLoaded) {
@@ -127,7 +144,7 @@ function BoardCtrl($scope, $http) {
 	};
 	
 	$scope.stop = function(b) {
-		if(typeof b == "number") {
+		if(/^\d+$/.test(b)) {
 			b = $scope.board.bumpers[b];
 		}
 		
@@ -135,6 +152,16 @@ function BoardCtrl($scope, $http) {
 		b.audioSource = null;
 		
 		b.playing = false;
+	};
+	
+	$scope.stopAll = function() {
+		if($scope.board) {
+			for(var i in $scope.board.bumpers) {
+				if($scope.board.bumpers[i].playing) {
+					$scope.stop(i);
+				}
+			}
+		}
 	};
 	
 	//check for tracks that were non-looping and have stopped
@@ -157,16 +184,16 @@ function BoardCtrl($scope, $http) {
 
 
 	if(localStorage.boards === "" || typeof localStorage.boards === "undefined") {
-		$http.get('defaultboard.json').success(function(d) {
-			$scope.board = d;
+		$http.get('defaultboards.json').success(function(d) {
+			$scope.boards = d;
 			
-			localStorage.boards = JSON.stringify([d]);
+			$scope.changeBoard(0);
 			
-			$scope.loadBumperSources();
+			localStorage.boards = JSON.stringify($scope.boards);
 		});
 	} else {
-		$scope.board = JSON.parse(localStorage.boards)[0];
+		$scope.boards = JSON.parse(localStorage.boards);
 		
-		$scope.loadBumperSources();
+		$scope.changeBoard(0);
 	}
 }

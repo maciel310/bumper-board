@@ -1,5 +1,5 @@
-<div id='controls'>
-	<h2>{{board.title}}&nbsp;</h2>
+<div id='controls' ng-click='selectBoard()'>
+	<h2>{{board.title}}</h2>
 </div>
 
 <div id='board'>
@@ -13,6 +13,16 @@
 <div id='loading-overlay' ng-hide='bumpersLoaded'>
 	<div>
 		Loading...
+	</div>
+</div>
+
+<div class='dialog' id='boardSelect' ng-show='showBoardSelectUI'>
+	<div>
+		<h1>Select a Board</h1>
+		<div ng-repeat='b in boards' ng-click='changeBoard($index)'>
+			<span ng-show='b==board'>&raquo;</span>
+			{{b.title}}
+		</div>
 	</div>
 </div>
 

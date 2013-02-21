@@ -7,15 +7,13 @@ Implement UI for displaying play status per bumper
 Implement editing bumper
 Implement creating new board
 
-Implement goToDelay option
-
 Implement as Chrome App (with offline support)
 
 Should a board-sharing feature be implemented? Would need a way of transferring tracks, too, once local loading is implemented
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
 */
 
-function BoardCtrl($scope, $http) {
+function BoardCtrl($scope, $http, $timeout) {
 	var audioContext = new webkitAudioContext();
 	
 	$scope.bumpersLoaded = false;
@@ -164,6 +162,20 @@ function BoardCtrl($scope, $http) {
 		}
 	};
 	
+	//start playback of next track if one is defined in the bumper
+	//TODO: refactor to use Web Audio API's native scheduling instead of imprecise browser timeouts
+	$scope.goToNextTrack = function(b) {
+		if(/^\d+$/.test(b)) {
+			b = $scope.board.bumpers[b];
+		}
+		
+		if(typeof b.goTo !== "undefined" && b.goTo !== -1) {
+			$timeout(function() {
+				$scope.startTrack(b.goTo);
+			}, (typeof b.goToDelay == "undefined" ? 0 : b.goToDelay*1000));
+		}
+	};
+	
 	//check for tracks that were non-looping and have stopped
 	//TODO: Make this check smarter (schedule the check on play start instead of constantly checking blindly)
 	setInterval(function() {
@@ -173,9 +185,7 @@ function BoardCtrl($scope, $http) {
 				if(b.audioSource && b.audioSource.playbackState === 3) {
 					angular.element(document.querySelector('#board')).scope().$apply("stop(" + i + ")");
 					
-					if(typeof b.goTo !== "undefined" && b.goTo !== -1) {
-						angular.element(document.querySelector('#board')).scope().$apply("startTrack(" + b.goTo + ")");
-					}
+					angular.element(document.querySelector('#board')).scope().$apply("goToNextTrack(" + i + ")");
 				}
 			}
 		}

@@ -229,9 +229,7 @@ function BoardCtrl($scope, $http, $timeout) {
 		}
 	}, 100);
 
-
-
-	if(localStorage.boards === "" || typeof localStorage.boards === "undefined") {
+	$scope.getDefaultBoards = function() {
 		$http.get('defaultboards.json').success(function(d) {
 			$scope.boards = d;
 			
@@ -239,6 +237,10 @@ function BoardCtrl($scope, $http, $timeout) {
 			
 			localStorage.boards = JSON.stringify($scope.boards);
 		});
+	};
+
+	if(localStorage.boards === "" || typeof localStorage.boards === "undefined") {
+		$scope.getDefaultBoards();
 	} else {
 		$scope.boards = JSON.parse(localStorage.boards);
 		

@@ -63,7 +63,7 @@ function BoardCtrl($scope, $http, $timeout) {
 		if($scope.board != $scope.boards[i]) {
 			$scope.stopAll();
 			
-			$scope.bumpersLoaded = false; //NoCommit!
+			$scope.bumpersLoaded = false;
 			$scope.board = $scope.boards[i];
 			$scope.loadBumperSources();
 		}

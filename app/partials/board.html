@@ -1,4 +1,4 @@
-<div id='controls' ng-click='selectBoard()'>
+<div id='controls' ng-click='showBoardSelectUI = true'>
 	<h2>{{board.title}}</h2>
 </div>
 
@@ -22,6 +22,31 @@
 		<div ng-repeat='b in boards' ng-click='changeBoard($index)'>
 			<span ng-show='b==board'>&raquo;</span>
 			{{b.title}}
+		</div>
+		
+		<div id='boardSelectControls'>
+			<button type='button' ng-click='showBoardSelectUI=false'>Cancel</button>
+			<button type='button' ng-click='showNewBoardUI=true'>New Board</button>
+		</div>
+		
+		<div id='newboard' ng-show='showNewBoardUI'>
+			<h2>New Board</h2>
+			<form>
+				<div>
+					<label for='title'>Title</label>
+					<input id="title" ng-model="newTitle" />
+				</div>
+				<div>
+					<label for='rows'>Rows</label>
+					<input id="rows" ng-model="newRows" type='number' />
+				</div>
+				<div>
+					<label for='cols'>Cols</label>
+					<input id="cols" ng-model="newCols" type='number' />
+				</div>
+				<button type='button' ng-click='createBoard()'>Create</button>
+				<button type='button' ng-click='showNewBoardUI=false'>Cancel</button>
+			</form>
 		</div>
 	</div>
 </div>

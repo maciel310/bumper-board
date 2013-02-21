@@ -5,7 +5,6 @@ Implement UI for displaying play status per bumper
 --Different colors/indicators for background and looping tracks
 
 Implement editing bumper
-Implement creating new board
 
 Implement as Chrome App (with offline support)
 
@@ -18,16 +17,53 @@ function BoardCtrl($scope, $http, $timeout) {
 	
 	$scope.bumpersLoaded = false;
 	$scope.showBoardSelectUI = false;
+	$scope.showNewBoardUI = false;
 	
-	$scope.selectBoard = function() {
-		$scope.showBoardSelectUI = true;
+	$scope.newTitle = '';
+	$scope.newRows = 1;
+	$scope.newCols = 1;
+	
+	$scope.createBoard = function() {
+		var newBoard = {
+			"title": $scope.newTitle,
+			"rows": $scope.newRows,
+			"cols": $scope.newCols,
+			"bumpers": []
+		};
+		
+		for(var i=0; i<$scope.newRows*$scope.newCols; i++) {
+			newBoard.bumpers.push({
+				"label": "",
+				"src": "",
+				"trackStart": 0,
+				"fadeIn": 0,
+				"background": false,
+				"loop": false,
+				"loopStart": 0,
+				"loopEnd": 0,
+				"volume": 1.0,
+				"goTo": -1,
+				"goToDelay": 0
+			});
+		}
+		
+		
+		$scope.boards.push(newBoard);
+		$scope.changeBoard($scope.boards.length-1);
+		
+		$scope.showBoardSelectUI = false;
+		$scope.showNewBoardUI = false;
+
+		$scope.newTitle = '';
+		$scope.newRows = 1;
+		$scope.newCols = 1;
 	};
 	
 	$scope.changeBoard = function(i) {
 		if($scope.board != $scope.boards[i]) {
 			$scope.stopAll();
 			
-			$scope.bumpersLoaded = false;
+			$scope.bumpersLoaded = false; //NoCommit!
 			$scope.board = $scope.boards[i];
 			$scope.loadBumperSources();
 		}
@@ -40,6 +76,8 @@ function BoardCtrl($scope, $http, $timeout) {
 			for(var i in $scope.board.bumpers) {
 				if($scope.board.bumpers[i].src !== '') {
 					$scope.getBumperFile(i);
+				} else {
+					$scope.checkBumperLoadComplete();
 				}
 			}
 		}

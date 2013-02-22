@@ -65,7 +65,10 @@ function BoardCtrl($scope, $http, $timeout) {
 			
 			$scope.bumpersLoaded = false;
 			$scope.board = $scope.boards[i];
-			$scope.loadBumperSources();
+			
+			//Setting a timeout of 0 allows the current call stack to complete and the BumperCtrl's
+			//to be loaded before referenced within this call
+			$timeout($scope.loadBumperSources, 0);
 		}
 		
 		$scope.showBoardSelectUI = false;
@@ -75,37 +78,12 @@ function BoardCtrl($scope, $http, $timeout) {
 		if(!$scope.bumpersLoaded) {
 			for(var i in $scope.board.bumpers) {
 				if($scope.board.bumpers[i].src !== '') {
-					$scope.getBumperFile(i);
+					$scope.getBumperScope(i).init();
 				} else {
 					$scope.checkBoardLoadComplete();
 				}
 			}
 		}
-	};
-	
-	//TODO: move to BumperCtrl
-	$scope.getBumperFile = function(i) {
-		var req = new XMLHttpRequest();
-		req.open('GET', $scope.board.bumpers[i].src, true);
-		req.responseType = 'arraybuffer';
-		
-		req.onload = function() {
-			console.log("XHR Finished");
-			
-			$scope.audioContext.decodeAudioData(req.response, function(buffer) {
-				console.log("Decoding Finished");
-				$scope.board.bumpers[i].buffer = buffer;
-				$scope.board.bumpers[i].playing = false;
-				
-				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
-			}, function onError(e) {
-				alert("An error occurred!");
-				console.log(arguments);
-			});
-			
-		};
-		
-		req.send();
 	};
 	
 	$scope.checkBoardLoadComplete = function() {
@@ -169,6 +147,30 @@ function BoardCtrl($scope, $http, $timeout) {
 }
 
 function BumperCtrl($scope, $http, $timeout) {
+	$scope.init = function(i) {
+		var req = new XMLHttpRequest();
+		req.open('GET', $scope.bumper.src, true);
+		req.responseType = 'arraybuffer';
+		
+		req.onload = function() {
+			console.log("XHR Finished");
+			
+			$scope.audioContext.decodeAudioData(req.response, function(buffer) {
+				console.log("Decoding Finished");
+				$scope.bumper.buffer = buffer;
+				$scope.bumper.playing = false;
+				
+				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
+			}, function onError(e) {
+				alert("An error occurred!");
+				console.log(arguments);
+			});
+			
+		};
+		
+		req.send();
+	};
+	
 	$scope.startTrack = function() {
 		if($scope.bumper.src !== '') {
 			if(!$scope.bumper.playing) {

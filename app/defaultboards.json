@@ -24,7 +24,9 @@
 				"loop": false,
 				"loopStart": 0,
 				"loopEnd": 0,
-				"volume": 1.0
+				"volume": 1.0,
+				"goTo": 0,
+				"goToDelay": 0
 			},
 			{
 				"label": "Wrong",
@@ -35,7 +37,9 @@
 				"loop": false,
 				"loopStart": 0,
 				"loopEnd": 0,
-				"volume": 1.0
+				"volume": 1.0,
+				"goTo": 0,
+				"goToDelay": 2
 			}
 		]
 	},

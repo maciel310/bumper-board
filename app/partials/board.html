@@ -3,7 +3,8 @@
 </div>
 
 <div id='board'>
-	<div ng-repeat="bumper in board.bumpers" ng-click='startTrack(bumper)' class='bumper playing-{{bumper.playing}}' 
+	<div ng-controller='BumperCtrl' ng-repeat="bumper in board.bumpers" ng-click='startTrack()' 
+			class='bumper playing-{{bumper.playing}}' id="bumper-{{$index}}"
 			style='width:{{95/board.cols | number:0}}%; height:{{95/board.rows | number:0}}%'>
 		{{bumper.label}}
 	</div>

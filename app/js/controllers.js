@@ -13,7 +13,7 @@ Should a board-sharing feature be implemented? Would need a way of transferring 
 */
 
 function BoardCtrl($scope, $http, $timeout) {
-	var audioContext = new webkitAudioContext();
+	$scope.audioContext = new webkitAudioContext();
 	
 	$scope.bumpersLoaded = false;
 	$scope.showBoardSelectUI = false;
@@ -77,12 +77,13 @@ function BoardCtrl($scope, $http, $timeout) {
 				if($scope.board.bumpers[i].src !== '') {
 					$scope.getBumperFile(i);
 				} else {
-					$scope.checkBumperLoadComplete();
+					$scope.checkBoardLoadComplete();
 				}
 			}
 		}
 	};
 	
+	//TODO: move to BumperCtrl
 	$scope.getBumperFile = function(i) {
 		var req = new XMLHttpRequest();
 		req.open('GET', $scope.board.bumpers[i].src, true);
@@ -91,12 +92,12 @@ function BoardCtrl($scope, $http, $timeout) {
 		req.onload = function() {
 			console.log("XHR Finished");
 			
-			audioContext.decodeAudioData(req.response, function(buffer) {
+			$scope.audioContext.decodeAudioData(req.response, function(buffer) {
 				console.log("Decoding Finished");
 				$scope.board.bumpers[i].buffer = buffer;
 				$scope.board.bumpers[i].playing = false;
 				
-				angular.element(document.querySelector('#board')).scope().$apply("checkBumperLoadComplete()");
+				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
 			}, function onError(e) {
 				alert("An error occurred!");
 				console.log(arguments);
@@ -107,7 +108,7 @@ function BoardCtrl($scope, $http, $timeout) {
 		req.send();
 	};
 	
-	$scope.checkBumperLoadComplete = function() {
+	$scope.checkBoardLoadComplete = function() {
 		var loaded = true;
 		
 		for(var i in $scope.board.bumpers) {
@@ -119,99 +120,18 @@ function BoardCtrl($scope, $http, $timeout) {
 		$scope.bumpersLoaded = loaded;
 	};
 	
-	$scope.startTrack = function(b) {
-		if(typeof b == "number") {
-			b = $scope.board.bumpers[b];
-		}
-		
-		if(b.src !== '') {
-			if(!b.playing) {
-				var i;
-				//if this is a background track, only stop other background tracks
-				if(b.background) {
-					for(i in $scope.board.bumpers) {
-						if($scope.board.bumpers[i] !== b && $scope.board.bumpers[i].background && 
-								$scope.board.bumpers[i].playing) {
-							$scope.stop($scope.board.bumpers[i]);
-						}
-					}
-				} else {
-					//stop all other non-background tracks
-					for(i in $scope.board.bumpers) {
-						if($scope.board.bumpers[i] !== b && !$scope.board.bumpers[i].background && 
-								$scope.board.bumpers[i].playing) {
-							$scope.stop($scope.board.bumpers[i]);
-						}
-					}
-				}
-				
-				$scope.play(b);
-			} else {
-				$scope.stop(b);
-			}
-		}
-	};
-	
-	$scope.play = function(b) {
-		var source = audioContext.createBufferSource();
-		var gain = audioContext.createGainNode();
-		
-		source.buffer = b.buffer;
-		source.connect(gain);
-		gain.connect(audioContext.destination);
-		
-		source.loop = b.loop;
-		source.loopStart = b.loopStart;
-		source.loopEnd = b.loopEnd;
-		
-		gain.gain.linearRampToValueAtTime(0, audioContext.currentTime);
-		gain.gain.linearRampToValueAtTime(b.volume, audioContext.currentTime + b.fadeIn);
-		
-		b.audioSource = source;
-		
-		//TrackStart parameter of .start is broken on current Chrome Stable. Catch error and retry without it
-		try {
-			source.start(0, b.trackStart);
-		} catch(e) {
-			source.start(0);
-		}
-		
-		b.playing = true;
-	};
-	
-	$scope.stop = function(b) {
-		if(/^\d+$/.test(b)) {
-			b = $scope.board.bumpers[b];
-		}
-		
-		b.audioSource.stop(0);
-		b.audioSource = null;
-		
-		b.playing = false;
-	};
-	
 	$scope.stopAll = function() {
 		if($scope.board) {
 			for(var i in $scope.board.bumpers) {
 				if($scope.board.bumpers[i].playing) {
-					$scope.stop(i);
+					$scope.getBumperScope(i).stop();
 				}
 			}
 		}
 	};
 	
-	//start playback of next track if one is defined in the bumper
-	//TODO: refactor to use Web Audio API's native scheduling instead of imprecise browser timeouts
-	$scope.goToNextTrack = function(b) {
-		if(/^\d+$/.test(b)) {
-			b = $scope.board.bumpers[b];
-		}
-		
-		if(typeof b.goTo !== "undefined" && b.goTo !== -1) {
-			$timeout(function() {
-				$scope.startTrack(b.goTo);
-			}, (typeof b.goToDelay == "undefined" ? 0 : b.goToDelay*1000));
-		}
+	$scope.getBumperScope = function(i) {
+		return angular.element('#bumper-' + i).scope();
 	};
 	
 	//check for tracks that were non-looping and have stopped
@@ -221,9 +141,9 @@ function BoardCtrl($scope, $http, $timeout) {
 			for(var i in $scope.board.bumpers) {
 				var b = $scope.board.bumpers[i];
 				if(b.audioSource && b.audioSource.playbackState === 3) {
-					angular.element(document.querySelector('#board')).scope().$apply("stop(" + i + ")");
+					$scope.getBumperScope(i).$apply("stop()");
 					
-					angular.element(document.querySelector('#board')).scope().$apply("goToNextTrack(" + i + ")");
+					$scope.getBumperScope(i).$apply("goToNextTrack()");
 				}
 			}
 		}
@@ -246,4 +166,81 @@ function BoardCtrl($scope, $http, $timeout) {
 		
 		$scope.changeBoard(0);
 	}
+}
+
+function BumperCtrl($scope, $http, $timeout) {
+	$scope.startTrack = function() {
+		if($scope.bumper.src !== '') {
+			if(!$scope.bumper.playing) {
+				var i;
+				//if this is a background track, only stop other background tracks
+				if($scope.bumper.background) {
+					for(i in $scope.board.bumpers) {
+						if($scope.board.bumpers[i] !== $scope.bumper && $scope.board.bumpers[i].background && 
+								$scope.board.bumpers[i].playing) {
+							$scope.getBumperScope(i).stop();
+						}
+					}
+				} else {
+					//stop all other non-background tracks
+					for(i in $scope.board.bumpers) {
+						if($scope.board.bumpers[i] !== $scope.bumper && !$scope.board.bumpers[i].background && 
+								$scope.board.bumpers[i].playing) {
+							$scope.getBumperScope(i).stop();
+						}
+					}
+				}
+				
+				$scope.play();
+			} else {
+				$scope.stop();
+			}
+		}
+	};
+	
+	$scope.play = function() {
+		var source = $scope.audioContext.createBufferSource();
+		var gain = $scope.audioContext.createGainNode();
+		
+		source.buffer = $scope.bumper.buffer;
+		source.connect(gain);
+		gain.connect($scope.audioContext.destination);
+		
+		source.loop = $scope.bumper.loop;
+		source.loopStart = $scope.bumper.loopStart;
+		source.loopEnd = $scope.bumper.loopEnd;
+		
+		gain.gain.linearRampToValueAtTime(0, $scope.audioContext.currentTime);
+		gain.gain.linearRampToValueAtTime($scope.bumper.volume, $scope.audioContext.currentTime + $scope.bumper.fadeIn);
+		
+		$scope.bumper.audioSource = source;
+		
+		//TrackStart parameter of .start is broken on current Chrome Stable. Catch error and retry without it
+		try {
+			source.start(0, $scope.bumper.trackStart);
+		} catch(e) {
+			source.start(0);
+		}
+		
+		$scope.bumper.playing = true;
+	};
+	
+	$scope.stop = function() {
+		$scope.bumper.audioSource.stop(0);
+		$scope.bumper.audioSource = null;
+		
+		$scope.bumper.playing = false;
+	};
+
+	
+	//start playback of next track if one is defined in the bumper
+	//TODO: refactor to use Web Audio API's native scheduling instead of imprecise browser timeouts
+	$scope.goToNextTrack = function() {
+		if(typeof $scope.bumper.goTo !== "undefined" && $scope.bumper.goTo !== -1) {
+			$timeout(function() {
+				$scope.getBumperScope($scope.bumper.goTo).startTrack();
+			}, (typeof $scope.bumper.goToDelay == "undefined" ? 0 : $scope.bumper.goToDelay*1000));
+		}
+	};
+	
 }

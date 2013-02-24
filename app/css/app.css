@@ -44,7 +44,7 @@ html, body {
 	height: 330px;
 }
 
-#boardSelectControls {
+.dialog .controls {
 	position: absolute;
 	bottom: 20px;
 	left: 20px;
@@ -60,10 +60,18 @@ html, body {
 }
 
 .bumper {
+	position: relative;
 	display: inline-block;
 	text-align: center;
 	border: black solid 1px;
 	vertical-align: top;
+}
+
+.bumper .edit {
+	display: inline-block;
+	position: absolute;
+	bottom: 15px;
+	right: 15px;
 }
 
 .playing-true {

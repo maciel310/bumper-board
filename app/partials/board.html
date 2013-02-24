@@ -7,6 +7,8 @@
 			class='bumper playing-{{bumper.playing}}' id="bumper-{{$index}}"
 			style='width:{{95/board.cols | number:0}}%; height:{{95/board.rows | number:0}}%'>
 		{{bumper.label}}
+		
+		<div ng-click="editBumper($index)" class='edit'>Edit</div>
 	</div>
 </div>
 
@@ -14,6 +16,53 @@
 <div id='loading-overlay' ng-hide='bumpersLoaded'>
 	<div>
 		Loading...
+	</div>
+</div>
+
+<div class='dialog' id='bumperEdit' ng-show='showBumperEditUI'>
+	<div>
+		<h1>Edit Bumper</h1>
+		
+		<div>
+			<label for='label'>Label</label>
+			<input id='label' ng-model='editingBumper.label' />
+		</div>
+		<div>
+			<label for='src'>Src</label>
+			<input id='src' ng-model='editingBumper.src' />
+		</div>
+		<div>
+			<label for='trackStart'>Track Start</label>
+			<input id='trackStart' ng-model='editingBumper.trackStart' />
+		</div>
+		<div>
+			<label for='fadeIn'>Fade In (s)</label>
+			<input id='fadeIn' ng-model='editingBumper.fadeIn' />
+		</div>
+		<div>
+			<label for='background'>Background</label>
+			<input id='background' ng-model='editingBumper.background' type='checkbox' />
+		</div>
+		<div>
+			<label for='loop'>Loop</label>
+			<input id='loop' ng-model='editingBumper.loop' type='checkbox' />
+		</div>
+		<div>
+			<label for='loopStart'>Loop Start (s)</label>
+			<input id='loopStart' ng-model='editingBumper.loopStart' />
+		</div>
+		<div>
+			<label for='loopEnd'>Loop End (s)</label>
+			<input id='loopEnd' ng-model='editingBumper.loopEnd' />
+		</div>
+		<div>
+			<label for='volume'>Volume</label>
+			<input id='volume' ng-model='editingBumper.volume' />
+		</div>
+		
+		<div class='controls'>
+			<button type='button' ng-click='saveBumper()'>Save</button>
+		</div>
 	</div>
 </div>
 
@@ -25,7 +74,7 @@
 			{{b.title}}
 		</div>
 		
-		<div id='boardSelectControls'>
+		<div class='controls'>
 			<button type='button' ng-click='showBoardSelectUI=false'>Cancel</button>
 			<button type='button' ng-click='showNewBoardUI=true'>New Board</button>
 			<button type='button' ng-click='getDefaultBoards()'>Restore Default Boards</button>

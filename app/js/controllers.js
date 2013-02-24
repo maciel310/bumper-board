@@ -4,9 +4,11 @@ TODO:
 Implement UI for displaying play status per bumper
 --Different colors/indicators for background and looping tracks
 
-Implement editing bumper
+Extend bumper edit UI
 
 Implement as Chrome App (with offline support)
+
+Fix issue where clicking Edit also starts the bumper
 
 Should a board-sharing feature be implemented? Would need a way of transferring tracks, too, once local loading is implemented
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
@@ -18,6 +20,7 @@ function BoardCtrl($scope, $http, $timeout) {
 	$scope.bumpersLoaded = false;
 	$scope.showBoardSelectUI = false;
 	$scope.showNewBoardUI = false;
+	$scope.showBumperEditUI = false;
 	
 	$scope.newTitle = '';
 	$scope.newRows = 1;
@@ -90,7 +93,7 @@ function BoardCtrl($scope, $http, $timeout) {
 		var loaded = true;
 		
 		for(var i in $scope.board.bumpers) {
-			if($scope.board.bumpers[i].src !== '' && typeof $scope.board.bumpers[i].buffer == 'undefined') {
+			if($scope.board.bumpers[i].src !== '' && (typeof $scope.board.bumpers[i].buffer == 'undefined' || $scope.board.bumpers[i].buffer === null)) {
 				loaded = false;
 			}
 		}
@@ -106,6 +109,44 @@ function BoardCtrl($scope, $http, $timeout) {
 				}
 			}
 		}
+	};
+	
+	$scope.editBumper = function(b) {
+		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume"];
+		$scope.editingBumper = {};
+		for(var i in props) {
+			$scope.editingBumper[props[i]] = $scope.board.bumpers[b][props[i]];
+		}
+		$scope.editingBumperIndex = b;
+		$scope.showBumperEditUI = true;
+	};
+	
+	$scope.saveBumper = function() {
+		var rerunInit = false;
+		if($scope.editingBumper.src !== $scope.board.bumpers[$scope.editingBumperIndex].src) {
+			if($scope.board.bumpers[$scope.editingBumperIndex].playing) {
+				$scope.getBumperScope($scope.editingBumperIndex).stop();
+			}
+			
+			$scope.board.bumpers[$scope.editingBumperIndex].buffer = null;
+			
+			rerunInit = true;
+		}
+		
+		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume"];
+		for(var i in props) {
+			$scope.board.bumpers[$scope.editingBumperIndex][props[i]] = $scope.editingBumper[props[i]];
+		}
+		
+		if(rerunInit) {
+			$scope.bumpersLoaded = false;
+			
+			$scope.getBumperScope($scope.editingBumperIndex).init();
+		}
+		
+		$scope.editingBumper = {};
+		
+		$scope.showBumperEditUI = false;
 	};
 	
 	$scope.getBumperScope = function(i) {
@@ -244,5 +285,4 @@ function BumperCtrl($scope, $http, $timeout) {
 			}, (typeof $scope.bumper.goToDelay == "undefined" ? 0 : $scope.bumper.goToDelay*1000));
 		}
 	};
-	
 }

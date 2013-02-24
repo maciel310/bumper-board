@@ -153,21 +153,6 @@ function BoardCtrl($scope, $http, $timeout) {
 		return angular.element('#bumper-' + i).scope();
 	};
 	
-	//check for tracks that were non-looping and have stopped
-	//TODO: Make this check smarter (schedule the check on play start instead of constantly checking blindly)
-	setInterval(function() {
-		if($scope.board) {
-			for(var i in $scope.board.bumpers) {
-				var b = $scope.board.bumpers[i];
-				if(b.audioSource && b.audioSource.playbackState === 3) {
-					$scope.getBumperScope(i).$apply("stop()");
-					
-					$scope.getBumperScope(i).$apply("goToNextTrack()");
-				}
-			}
-		}
-	}, 100);
-
 	$scope.getDefaultBoards = function() {
 		$http.get('defaultboards.json').success(function(d) {
 			$scope.boards = d;
@@ -266,6 +251,12 @@ function BumperCtrl($scope, $http, $timeout) {
 		}
 		
 		$scope.bumper.playing = true;
+		
+		if(!$scope.bumper.loop) {
+			//schedule a timeout for a second before the track should end to poll for when it completes
+			var totalDuration = $scope.bumper.buffer.duration - $scope.bumper.trackStart - 1;
+			$timeout($scope.checkTrackEnd, Math.max(totalDuration*1000, 0));
+		}
 	};
 	
 	$scope.stop = function() {
@@ -283,6 +274,18 @@ function BumperCtrl($scope, $http, $timeout) {
 			$timeout(function() {
 				$scope.getBumperScope($scope.bumper.goTo).startTrack();
 			}, (typeof $scope.bumper.goToDelay == "undefined" ? 0 : $scope.bumper.goToDelay*1000));
+		}
+	};
+	
+	
+	$scope.checkTrackEnd = function() {
+		if($scope.bumper.audioSource && $scope.bumper.audioSource.playbackState === 3) {
+			//playback has finished, call stop() (cleans up) and start next track (if applicable)
+			$scope.stop();
+			$scope.goToNextTrack();
+		} else if($scope.bumper.audioSource) {
+			//hasn't finished yet, so wait 50ms and check again
+			$timeout($scope.checkTrackEnd, 50);
 		}
 	};
 }

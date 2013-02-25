@@ -14,7 +14,9 @@ Should a board-sharing feature be implemented? Would need a way of transferring 
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
 */
 
-function BoardCtrl($scope, $http, $timeout) {
+var controllerModule = angular.module('bumperBoard.controllers', []);
+
+controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', function BoardCtrl($scope, $http, $timeout) {
 	$scope.audioContext = new webkitAudioContext();
 	
 	$scope.bumpersLoaded = false;
@@ -170,9 +172,11 @@ function BoardCtrl($scope, $http, $timeout) {
 		
 		$scope.changeBoard(0);
 	}
-}
 
-function BumperCtrl($scope, $http, $timeout) {
+
+}]);
+
+controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', function BumperCtrl($scope, $http, $timeout) {
 	$scope.init = function(i) {
 		var req = new XMLHttpRequest();
 		req.open('GET', $scope.bumper.src, true);
@@ -288,4 +292,4 @@ function BumperCtrl($scope, $http, $timeout) {
 			$timeout($scope.checkTrackEnd, 50);
 		}
 	};
-}
+}]);

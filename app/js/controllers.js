@@ -119,7 +119,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 	};
 	
 	$scope.editBumper = function(b) {
-		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume"];
+		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		$scope.editingBumper = {};
 		for(var i in props) {
 			$scope.editingBumper[props[i]] = $scope.board.bumpers[b][props[i]];
@@ -140,7 +140,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 			rerunInit = true;
 		}
 		
-		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume"];
+		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		for(var i in props) {
 			$scope.board.bumpers[$scope.editingBumperIndex][props[i]] = $scope.editingBumper[props[i]];
 		}

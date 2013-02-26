@@ -183,16 +183,13 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 
 controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window) {
 	$scope.init = function(i) {
-		audioDecoder.loadFromURL($scope.bumper.src, function(buffer) {
-			if(buffer !== null) {
-				$scope.bumper.buffer = buffer;
-				$scope.bumper.playing = false;
-				
-				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
-			} else {
-				$window.alert("An error occurred!");
-				console.log(arguments);
-			}
+		audioDecoder.loadFromURL($scope.bumper.src).then(function(buffer) {
+			$scope.bumper.buffer = buffer;
+			$scope.bumper.playing = false;
+			
+			angular.element('#board').scope().checkBoardLoadComplete();
+		}, function(err) {
+			$window.alert(err);
 		});
 	};
 	

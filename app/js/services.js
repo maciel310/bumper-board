@@ -10,31 +10,32 @@
 // In this case it is a simple value service.
 var serviceModule = angular.module('bumperBoard.services', []);
 
-serviceModule.factory('audioDecoder', function() {
+serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {
 	var audioContext = new webkitAudioContext();
 	
 	return {
-		loadFromURL: function(src, cb) {
-			var req = new XMLHttpRequest();
-			req.open('GET', src, true);
-			req.responseType = 'arraybuffer';
+		loadFromURL: function(src) {
+			var def = $q.defer();
 			
-			req.onload = function() {
-				console.log("XHR Finished");
+			$http.get(src, {responseType: 'arraybuffer'}).success(function(data) {
+				console.log("Request Complete");
 				
-				audioContext.decodeAudioData(req.response, function(buffer) {
-					console.log("Decoding Finished");
+				audioContext.decodeAudioData(data, function(buffer) {
+					console.log("Decoding Complete");
 					
-					cb(buffer);
+					def.resolve(buffer);
+					
+					angular.element('#board').scope().$apply();
 				}, function onError(e) {
-					cb(null);
+					def.reject("Error decoding audio stream");
 				});
-				
-			};
+			}).error(function() {
+				def.reject("Error with HTTP Request");
+			});
 			
-			req.send();
+			return def.promise;
 		}
 	};
-});
+}]);
 
 })();

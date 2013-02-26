@@ -1,4 +1,8 @@
+(function() {
 'use strict';
+/*globals angular,webkitAudioContext,console*/
+/*jshint newcap: false */
+
 
 /* Services */
 
@@ -32,3 +36,5 @@ serviceModule.factory('audioDecoder', function() {
 		}
 	};
 });
+
+})();

@@ -1,3 +1,8 @@
+(function() {
+'use strict';
+/*globals angular,webkitAudioContext,console*/
+/*jshint newcap: false */
+
 /*
 TODO:
 
@@ -176,7 +181,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 
 }]);
 
-controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', function BumperCtrl($scope, $http, $timeout, audioDecoder) {
+controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window) {
 	$scope.init = function(i) {
 		audioDecoder.loadFromURL($scope.bumper.src, function(buffer) {
 			if(buffer !== null) {
@@ -185,7 +190,7 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 				
 				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
 			} else {
-				alert("An error occurred!");
+				$window.alert("An error occurred!");
 				console.log(arguments);
 			}
 		});
@@ -283,3 +288,6 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 		}
 	};
 }]);
+
+
+})();

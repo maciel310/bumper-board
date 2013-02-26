@@ -14,7 +14,7 @@ Should a board-sharing feature be implemented? Would need a way of transferring 
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
 */
 
-var controllerModule = angular.module('bumperBoard.controllers', []);
+var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services']);
 
 controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', function BoardCtrl($scope, $http, $timeout) {
 	$scope.audioContext = new webkitAudioContext();
@@ -176,29 +176,19 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 
 }]);
 
-controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', function BumperCtrl($scope, $http, $timeout) {
+controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', function BumperCtrl($scope, $http, $timeout, audioDecoder) {
 	$scope.init = function(i) {
-		var req = new XMLHttpRequest();
-		req.open('GET', $scope.bumper.src, true);
-		req.responseType = 'arraybuffer';
-		
-		req.onload = function() {
-			console.log("XHR Finished");
-			
-			$scope.audioContext.decodeAudioData(req.response, function(buffer) {
-				console.log("Decoding Finished");
+		audioDecoder.loadFromURL($scope.bumper.src, function(buffer) {
+			if(buffer !== null) {
 				$scope.bumper.buffer = buffer;
 				$scope.bumper.playing = false;
 				
 				angular.element('#board').scope().$apply("checkBoardLoadComplete()");
-			}, function onError(e) {
+			} else {
 				alert("An error occurred!");
 				console.log(arguments);
-			});
-			
-		};
-		
-		req.send();
+			}
+		});
 	};
 	
 	$scope.startTrack = function() {

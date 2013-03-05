@@ -26,7 +26,7 @@ Should a board-sharing feature be implemented? Would need a way of transferring 
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
 */
 
-var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services']);
+var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem']);
 
 controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', function BoardCtrl($scope, $http, $timeout) {
 	$scope.audioContext = new webkitAudioContext();

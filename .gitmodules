@@ -1,3 +1,4 @@
 [submodule "app/js/angular-filesystem"]
 	path = app/js/angular-filesystem
-	url = git@github.com:maciel310/angular-filesystem.git
+	url = git://github.com/maciel310/angular-filesystem.git
+

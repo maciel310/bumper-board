@@ -7,7 +7,7 @@ It is intended mainly for sound engineers who need to be able to quickly and eas
 
 ## How do I get it?
 
-It will be released as a Chrome App so you'll soon find it in the Chrome Web Store. There's still some work before it is ready for that, though, so until then you can fork the repository and serve it from any website (or local HTTP server). Note that the defaultboards.json file references some hard-coded paths to mp3s that are not included in the repository for copyright reasons. Please update this file with links to the appropriate mp3s on your server before loading for the first time. This is only temporary until the filesystem implementation is complete.
+It will be released as a Chrome App so you'll soon find it in the Chrome Web Store. There's still some work before it is ready for that, though, so until then you can fork the repository and serve it from any website (or local HTTP server). You'll have to run `git submodule init` and `git submodule update` after cloning in order to pull in the dependencies. Note that the defaultboards.json file references some hard-coded paths to mp3s that are not included in the repository for copyright reasons. Please update this file with links to the appropriate mp3s on your server before loading for the first time. This is only temporary until the filesystem implementation is complete.
 
 
 ## What's coming in the future?

@@ -189,7 +189,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 }]);
 
 controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window) {
-	$scope.init = function(i) {
+	$scope.init = function() {
 		audioDecoder.loadFromURL($scope.bumper.src).then(function(buffer) {
 			$scope.bumper.buffer = buffer;
 			$scope.bumper.playing = false;

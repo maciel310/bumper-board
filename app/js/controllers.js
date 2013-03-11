@@ -28,7 +28,7 @@ Should a board-sharing feature be implemented? Would need a way of transferring 
 
 var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem']);
 
-controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', function BoardCtrl($scope, $http, $timeout) {
+controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', 'fileSystem', function BoardCtrl($scope, $http, $timeout, $q, fileSystem) {
 	$scope.audioContext = new webkitAudioContext();
 	
 	$scope.bumpersLoaded = false;
@@ -160,6 +160,8 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 		
 		$scope.editingBumper = {};
 		
+		$scope.saveBoard();
+		
 		$scope.showBumperEditUI = false;
 	};
 	
@@ -169,23 +171,74 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', functio
 	
 	$scope.getDefaultBoards = function() {
 		$http.get('defaultboards.json').success(function(d) {
-			$scope.boards = d;
+			var savePromises = [];
 			
-			$scope.changeBoard(0);
+			for(var i=0; i<d.length; i++) {
+				savePromises.push($scope.saveBoard(d[i]));
+			}
 			
-			localStorage.boards = JSON.stringify($scope.boards);
+			$q.all(savePromises).then(function() {
+				$scope.loadBoards();
+			});
 		});
 	};
-
-	if(localStorage.boards === "" || typeof localStorage.boards === "undefined") {
-		$scope.getDefaultBoards();
-	} else {
-		$scope.boards = JSON.parse(localStorage.boards);
+	
+	$scope.saveBoard = function(board) {
+		var folderName = board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
 		
-		$scope.changeBoard(0);
-	}
-
-
+		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
+			return fileSystem.writeText('bumper-board/' + folderName + '/board.json', JSON.stringify(board));
+		}, function(err) {
+			def.reject(err);
+		});
+		
+		return def;
+	};
+	
+	$scope.loadBoard = function(path) {
+		var def = fileSystem.readFile(path + '/board.json').then(function(board) {
+			return JSON.parse(board);
+		});
+		
+		return def;
+	};
+	
+	$scope.loadBoards = function() {
+		//$scope.boards = JSON.parse(localStorage.boards);
+		
+		//$scope.changeBoard(0);
+		
+		fileSystem.getFolderContents('bumper-board').then(function(entries) {
+			var boardLoading = [];
+			for(var i=0; i<entries.length; i++) {
+				if(entries[i].isDirectory) {
+					var p = $scope.loadBoard(entries[i].fullPath);
+					boardLoading.push(p);
+				}
+			}
+			return $q.all(boardLoading);
+		}).then(function(boards) {
+			if(boards.length > 0) {
+				$scope.boards = boards;
+				
+				$scope.changeBoard(0);
+			} else {
+				console.log("No boards returned");
+				$scope.getDefaultBoards();
+			}
+		}, function(err) {
+			console.log(err);
+			$scope.getDefaultBoards();
+		});
+	};
+	
+	$scope.init = function() {
+		fileSystem.requestQuotaIncrease(100).then(function() {
+			$scope.loadBoards();
+		});
+	};
+	
+	$scope.init();
 }]);
 
 controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window) {

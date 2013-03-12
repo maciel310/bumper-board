@@ -174,22 +174,49 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			var savePromises = [];
 			
 			for(var i=0; i<d.length; i++) {
-				savePromises.push($scope.saveBoard(d[i]));
+				var board = d[i];
+				
+				var folderName = board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+				
+				savePromises.push($scope.saveBoard(board, folderName));
+				savePromises.push($scope.downloadBumpers(board, folderName));
 			}
 			
 			$q.all(savePromises).then(function() {
 				$scope.loadBoards();
+			}, function(err) {
+				console.log(err);
 			});
 		});
 	};
 	
-	$scope.saveBoard = function(board) {
-		var folderName = board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+	$scope.downloadBumpers = function(board, folderName) {
+		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
+			var writePromises = [];
+			
+			var writeBumper = function(src) {
+				var filename = src.substr(src.lastIndexOf('/')+1);
+				
+				var writePromise = $http.get(src, {responseType: 'arraybuffer'}).success(function(data) {
+					return fileSystem.writeArrayBuffer('bumper-board/' + folderName + '/' + filename, data, "audio/mpeg");
+				});
+				
+				return writePromise;
+			};
+			
+			for(var i=0; i<board.bumpers.length; i++) {
+				writePromises.push(writeBumper(board.bumpers[i].src));
+			}
+			
+			return $q.all(writePromises);
+		});
 		
+		return def;
+	};
+	
+	$scope.saveBoard = function(board, folderName) {
 		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
 			return fileSystem.writeText('bumper-board/' + folderName + '/board.json', JSON.stringify(board));
-		}, function(err) {
-			def.reject(err);
 		});
 		
 		return def;
@@ -212,10 +239,10 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			var boardLoading = [];
 			for(var i=0; i<entries.length; i++) {
 				if(entries[i].isDirectory) {
-					var p = $scope.loadBoard(entries[i].fullPath);
-					boardLoading.push(p);
+					boardLoading.push($scope.loadBoard(entries[i].fullPath));
 				}
 			}
+			
 			return $q.all(boardLoading);
 		}).then(function(boards) {
 			if(boards.length > 0) {

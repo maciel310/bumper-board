@@ -15,19 +15,19 @@ serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {
 	
 	var audioDecoder = {
 		loadFromURL: function(src) {
-			var def = $q.defer();
-			
-			$http.get(src, {responseType: 'arraybuffer'}).success(function(data) {
+			var def = $http.get(src, {responseType: 'arraybuffer'}).then(function(req) {
 				console.log("Request Complete");
 				
-				audioDecoder.fromArrayBuffer(data, def);
-			}).error(function() {
-				def.reject("Error with HTTP Request");
+				return audioDecoder.fromArrayBuffer(req.data);
+			}, function(err) {
+				return $q.reject("Error downloading bumper");
 			});
 			
-			return def.promise;
+			return def;
 		},
-		fromArrayBuffer: function(data, def) {
+		fromArrayBuffer: function(data) {
+			var def = $q.defer();
+			
 			audioContext.decodeAudioData(data, function(buffer) {
 				console.log("Decoding Complete");
 				
@@ -37,6 +37,8 @@ serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {
 			}, function onError(e) {
 				def.reject("Error decoding audio stream");
 			});
+			
+			return def.promise;
 		}
 	};
 	

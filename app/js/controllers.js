@@ -11,19 +11,16 @@ Implement UI for displaying play status per bumper
 
 Extend bumper edit UI
 
-Implement caching URL based bumper sources to local File System API
-
 Implement loading bumper source from File Selection API (also look at Drag & Drop support)
-
-Refactor storing of board config to store in the File System API along-side bumper tracks (folder hierarchy, one per board)
 
 Implement as Chrome App (with offline support)
 
 Fix issue where clicking Edit also starts the bumper
 
-Should a board-sharing feature be implemented? Would need a way of transferring tracks, too, once local loading is implemented
+Should a board-sharing feature be implemented? Would need a way of transferring tracks and config in one package
 --look at jszip to generate/load a single zip file for sharing
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
+--ideally should not rely on server-side code
 */
 
 var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem']);

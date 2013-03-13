@@ -5,8 +5,21 @@
 
 var serviceModule = angular.module('bumperBoard.services', ['fileSystem']);
 
-serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {
+serviceModule.factory('audioDecoder', ['$http', '$q', '$timeout', function($http, $q, $timeout) {
 	var audioContext = new webkitAudioContext();
+	
+	//wrap resolve/reject in an empty $timeout so it happens within the Angular call stack
+	//easier than .apply() since no scope is needed and doesn't error if already within an apply
+	function safeResolve(deferral, message) {
+		$timeout(function() {
+			deferral.resolve(message);
+		});
+	}
+	function safeReject(deferral, message) {
+		$timeout(function() {
+			deferral.reject(message);
+		});
+	}
 	
 	var audioDecoder = {
 		loadFromURL: function(src) {
@@ -26,11 +39,9 @@ serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {
 			audioContext.decodeAudioData(data, function(buffer) {
 				console.log("Decoding Complete");
 				
-				def.resolve(buffer);
-				
-				angular.element('#board').scope().$apply();
+				safeResolve(def, buffer);
 			}, function onError(e) {
-				def.reject("Error decoding audio stream");
+				safeReject(def, "Error decoding audio stream");
 			});
 			
 			return def.promise;

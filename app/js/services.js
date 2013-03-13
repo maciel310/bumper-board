@@ -3,11 +3,6 @@
 /*globals angular,webkitAudioContext,console*/
 /*jshint newcap: false */
 
-
-/* Services */
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
 var serviceModule = angular.module('bumperBoard.services', ['fileSystem']);
 
 serviceModule.factory('audioDecoder', ['$http', '$q', function($http, $q) {

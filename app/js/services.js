@@ -26,14 +26,14 @@ serviceModule.factory('audioDecoder', ['$http', '$q', '$timeout', function($http
 			var def = $http.get(src, {responseType: 'arraybuffer'}).then(function(req) {
 				console.log("Request Complete");
 				
-				return audioDecoder.fromArrayBuffer(req.data);
+				return audioDecoder.loadFromArrayBuffer(req.data);
 			}, function(err) {
 				return $q.reject("Error downloading bumper");
 			});
 			
 			return def;
 		},
-		fromArrayBuffer: function(data) {
+		loadFromArrayBuffer: function(data) {
 			var def = $q.defer();
 			
 			audioContext.decodeAudioData(data, function(buffer) {

@@ -271,7 +271,19 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 
 controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', 'fileSystem', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window, fileSystem) {
 	$scope.init = function() {
-		audioDecoder.loadFromURL($scope.bumper.src).then(function(buffer) {
+		var bufferLoadPromise;
+		
+		if($scope.bumper.filename) {
+			var folderName = $scope.board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+			
+			bufferLoadPromise = fileSystem.readFile('bumper-board/' + folderName + '/' + $scope.bumper.filename, "arraybuffer").then(function(data) {
+				return audioDecoder.loadFromArrayBuffer(data);
+			});
+		} else {
+			bufferLoadPromise = audioDecoder.loadFromURL($scope.bumper.src);
+		}
+		
+		bufferLoadPromise.then(function(buffer) {
 			$scope.bumper.buffer = buffer;
 			$scope.bumper.playing = false;
 			

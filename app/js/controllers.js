@@ -49,6 +49,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			newBoard.bumpers.push({
 				"label": "",
 				"src": "",
+				"filename": "",
 				"trackStart": 0,
 				"fadeIn": 0,
 				"background": false,
@@ -91,7 +92,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 	$scope.loadBumperSources = function() {
 		if(!$scope.bumpersLoaded) {
 			for(var i in $scope.board.bumpers) {
-				if($scope.board.bumpers[i].src !== '') {
+				if($scope.board.bumpers[i].filename !== '') {
 					$scope.getBumperScope(i).init();
 				} else {
 					$scope.checkBoardLoadComplete();
@@ -104,7 +105,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		var loaded = true;
 		
 		for(var i in $scope.board.bumpers) {
-			if($scope.board.bumpers[i].src !== '' && (typeof $scope.board.bumpers[i].buffer == 'undefined' || $scope.board.bumpers[i].buffer === null)) {
+			if($scope.board.bumpers[i].filename !== '' && (typeof $scope.board.bumpers[i].buffer == 'undefined' || $scope.board.bumpers[i].buffer === null)) {
 				loaded = false;
 			}
 		}
@@ -123,7 +124,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 	};
 	
 	$scope.editBumper = function(b) {
-		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
+		var props = ["label", "src", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		$scope.editingBumper = {};
 		for(var i in props) {
 			$scope.editingBumper[props[i]] = $scope.board.bumpers[b][props[i]];
@@ -144,7 +145,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			rerunInit = true;
 		}
 		
-		var props = ["label", "src", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
+		var props = ["label", "src", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		for(var i in props) {
 			$scope.board.bumpers[$scope.editingBumperIndex][props[i]] = $scope.editingBumper[props[i]];
 		}
@@ -175,6 +176,11 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 				
 				var folderName = board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
 				
+				for(var j=0; j<board.bumpers.length; j++) {
+					var bumper = board.bumpers[j];
+					bumper.filename = bumper.src.substr(bumper.src.lastIndexOf('/')+1);
+				}
+				
 				savePromises.push($scope.saveBoard(board, folderName));
 				savePromises.push($scope.downloadBumpers(board, folderName));
 			}
@@ -191,18 +197,16 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
 			var writePromises = [];
 			
-			var writeBumper = function(src) {
-				var filename = src.substr(src.lastIndexOf('/')+1);
-				
-				var writePromise = $http.get(src, {responseType: 'arraybuffer'}).success(function(data) {
-					return fileSystem.writeArrayBuffer('bumper-board/' + folderName + '/' + filename, data, "audio/mpeg");
+			var writeBumper = function(bumper) {
+				var writePromise = $http.get(bumper.src, {responseType: 'arraybuffer'}).success(function(data) {
+					return fileSystem.writeArrayBuffer('bumper-board/' + folderName + '/' + bumper.filename, data, "audio/mpeg");
 				});
 				
 				return writePromise;
 			};
 			
 			for(var i=0; i<board.bumpers.length; i++) {
-				writePromises.push(writeBumper(board.bumpers[i].src));
+				writePromises.push(writeBumper(board.bumpers[i]));
 			}
 			
 			return $q.all(writePromises);
@@ -265,7 +269,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 	$scope.init();
 }]);
 
-controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window) {
+controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audioDecoder', '$window', 'fileSystem', function BumperCtrl($scope, $http, $timeout, audioDecoder, $window, fileSystem) {
 	$scope.init = function() {
 		audioDecoder.loadFromURL($scope.bumper.src).then(function(buffer) {
 			$scope.bumper.buffer = buffer;
@@ -278,7 +282,7 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 	};
 	
 	$scope.startTrack = function() {
-		if($scope.bumper.src !== '') {
+		if($scope.bumper.filename !== '') {
 			if(!$scope.bumper.playing) {
 				var i;
 				//if this is a background track, only stop other background tracks

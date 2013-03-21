@@ -48,7 +48,6 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		for(var i=0; i<$scope.newRows*$scope.newCols; i++) {
 			newBoard.bumpers.push({
 				"label": "",
-				"src": "",
 				"filename": "",
 				"trackStart": 0,
 				"fadeIn": 0,
@@ -124,7 +123,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 	};
 	
 	$scope.editBumper = function(b) {
-		var props = ["label", "src", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
+		var props = ["label", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		$scope.editingBumper = {};
 		for(var i in props) {
 			$scope.editingBumper[props[i]] = $scope.board.bumpers[b][props[i]];
@@ -133,9 +132,16 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		$scope.showBumperEditUI = true;
 	};
 	
+	$scope.setEditFile = function(element) {
+		$scope.$apply(function($scope) {
+			$scope.editingBumper.file = element.files[0];
+			$scope.editingBumper.filename = $scope.editingBumper.file.name;
+		});
+	};
+	
 	$scope.saveBumper = function() {
 		var rerunInit = false;
-		if($scope.editingBumper.src !== $scope.board.bumpers[$scope.editingBumperIndex].src) {
+		if($scope.editingBumper.filename !== $scope.board.bumpers[$scope.editingBumperIndex].filename) {
 			if($scope.board.bumpers[$scope.editingBumperIndex].playing) {
 				$scope.getBumperScope($scope.editingBumperIndex).stop();
 			}
@@ -145,7 +151,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			rerunInit = true;
 		}
 		
-		var props = ["label", "src", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
+		var props = ["label", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		for(var i in props) {
 			$scope.board.bumpers[$scope.editingBumperIndex][props[i]] = $scope.editingBumper[props[i]];
 		}
@@ -153,7 +159,23 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		if(rerunInit) {
 			$scope.bumpersLoaded = false;
 			
-			$scope.getBumperScope($scope.editingBumperIndex).init();
+			//save bumper to local filesystem
+			var reader = new FileReader();
+			
+			reader.onload = function(e) {
+				console.log(buf);
+				var buf = e.target.result;
+				
+				var folderName = $scope.boardFolderName($scope.board.title);
+				var filename = 'bumper-board/' + folderName + '/' + $scope.editingBumper.filename;
+				console.log(filename);
+				
+				fileSystem.writeArrayBuffer(filename, buf, "audio/mpeg").then(function() {
+					$scope.getBumperScope($scope.editingBumperIndex).init();
+				});
+			};
+			
+			reader.readAsArrayBuffer($scope.editingBumper.file);
 		}
 		
 		$scope.editingBumper = {};
@@ -167,6 +189,10 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		return angular.element('#bumper-' + i).scope();
 	};
 	
+	$scope.boardFolderName = function(title) {
+		return title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+	};
+	
 	$scope.getDefaultBoards = function() {
 		$http.get('defaultboards.json').success(function(d) {
 			var savePromises = [];
@@ -174,7 +200,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			for(var i=0; i<d.length; i++) {
 				var board = d[i];
 				
-				var folderName = board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+				var folderName = $scope.boardFolderName(board.title);
 				
 				for(var j=0; j<board.bumpers.length; j++) {
 					var bumper = board.bumpers[j];
@@ -274,7 +300,7 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 		var bufferLoadPromise;
 		
 		if($scope.bumper.filename) {
-			var folderName = $scope.board.title.toLowerCase().replace(/[^a-z0-9\s\-]/g, "").replace(/\s+/, '-');
+			var folderName = $scope.boardFolderName($scope.board.title);
 			
 			bufferLoadPromise = fileSystem.readFile('bumper-board/' + folderName + '/' + $scope.bumper.filename, "arraybuffer").then(function(data) {
 				return audioDecoder.loadFromArrayBuffer(data);

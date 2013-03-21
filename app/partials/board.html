@@ -28,8 +28,8 @@
 			<input id='label' ng-model='editingBumper.label' />
 		</div>
 		<div>
-			<label for='src'>Src</label>
-			<input id='src' ng-model='editingBumper.src' />
+			<label for='filename'>Filename</label>
+			{{editingBumper.filename}} <input type='file' id='filename' onchange='angular.element(this).scope().setEditFile(this)' />
 		</div>
 		<div>
 			<label for='trackStart'>Track Start</label>

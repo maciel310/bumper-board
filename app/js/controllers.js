@@ -169,11 +169,12 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			reader.onload = function(e) {
 				var buf = e.target.result;
 				
-				fileSystem.writeArrayBuffer(filename, buf, "audio/mpeg").then(function() {
-					console.log("Written");
-					$scope.getBumperScope($scope.editingBumperIndex).init();
-				}, function(e) {
-					console.log(e);
+				$timeout(function() {
+					fileSystem.writeArrayBuffer(filename, buf, "audio/mpeg").then(function() {
+						$scope.getBumperScope($scope.editingBumperIndex).init();
+					}, function(e) {
+						console.log(e);
+					});
 				});
 			};
 			
@@ -183,7 +184,7 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		
 		$scope.editingBumper = {};
 		
-		//$scope.saveBoard();
+		$scope.saveBoard($scope.board);
 		
 		$scope.showBumperEditUI = false;
 	};
@@ -203,15 +204,13 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			for(var i=0; i<d.length; i++) {
 				var board = d[i];
 				
-				var folderName = $scope.boardFolderName(board.title);
-				
 				for(var j=0; j<board.bumpers.length; j++) {
 					var bumper = board.bumpers[j];
 					bumper.filename = bumper.src.substr(bumper.src.lastIndexOf('/')+1);
 				}
 				
-				savePromises.push($scope.saveBoard(board, folderName));
-				savePromises.push($scope.downloadBumpers(board, folderName));
+				savePromises.push($scope.saveBoard(board));
+				savePromises.push($scope.downloadBumpers(board));
 			}
 			
 			$q.all(savePromises).then(function() {
@@ -222,7 +221,9 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		});
 	};
 	
-	$scope.downloadBumpers = function(board, folderName) {
+	$scope.downloadBumpers = function(board) {
+		var folderName = $scope.boardFolderName(board.title);
+		
 		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
 			var writePromises = [];
 			
@@ -244,7 +245,9 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		return def;
 	};
 	
-	$scope.saveBoard = function(board, folderName) {
+	$scope.saveBoard = function(board) {
+		var folderName = $scope.boardFolderName(board.title);
+		
 		var def = fileSystem.createFolder('bumper-board/' + folderName).then(function() {
 			return fileSystem.writeText('bumper-board/' + folderName + '/board.json', JSON.stringify(board));
 		});

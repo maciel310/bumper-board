@@ -159,28 +159,31 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		if(rerunInit) {
 			$scope.bumpersLoaded = false;
 			
+			var folderName = $scope.boardFolderName($scope.board.title);
+			var filename = 'bumper-board/' + folderName + '/' + $scope.editingBumper.filename;
+			
+			
 			//save bumper to local filesystem
 			var reader = new FileReader();
 			
 			reader.onload = function(e) {
-				console.log(buf);
 				var buf = e.target.result;
 				
-				var folderName = $scope.boardFolderName($scope.board.title);
-				var filename = 'bumper-board/' + folderName + '/' + $scope.editingBumper.filename;
-				console.log(filename);
-				
 				fileSystem.writeArrayBuffer(filename, buf, "audio/mpeg").then(function() {
+					console.log("Written");
 					$scope.getBumperScope($scope.editingBumperIndex).init();
+				}, function(e) {
+					console.log(e);
 				});
 			};
 			
 			reader.readAsArrayBuffer($scope.editingBumper.file);
+
 		}
 		
 		$scope.editingBumper = {};
 		
-		$scope.saveBoard();
+		//$scope.saveBoard();
 		
 		$scope.showBumperEditUI = false;
 	};

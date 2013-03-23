@@ -5,18 +5,18 @@
 		"cols": 3,
 		"bumpers": [
 			{
-				"label": "Somebody That I Used To Know",
-				"src": "/bumper-board/know.mp3",
+				"label": "Right 1",
+				"src": "/bumper-board/Right.mp3",
 				"trackStart": 5,
 				"fadeIn": 1,
-				"background": true,
-				"loop": true,
-				"loopStart": 50,
-				"loopEnd": 240,
+				"background": false,
+				"loop": false,
+				"loopStart": 0,
+				"loopEnd": 0,
 				"volume": 1.0
 			},
 			{
-				"label": "Right",
+				"label": "Right 2",
 				"src": "/bumper-board/Right.mp3",
 				"trackStart": 0,
 				"fadeIn": 0,
@@ -25,7 +25,7 @@
 				"loopStart": 0,
 				"loopEnd": 0,
 				"volume": 1.0,
-				"goTo": 0,
+				"goTo": -1,
 				"goToDelay": 0
 			},
 			{

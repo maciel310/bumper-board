@@ -162,24 +162,9 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 			var folderName = $scope.boardFolderName($scope.board.title);
 			var filename = 'bumper-board/' + folderName + '/' + $scope.editingBumper.filename;
 			
-			
-			//save bumper to local filesystem
-			var reader = new FileReader();
-			
-			reader.onload = function(e) {
-				var buf = e.target.result;
-				
-				$timeout(function() {
-					fileSystem.writeArrayBuffer(filename, buf, "audio/mpeg").then(function() {
-						$scope.getBumperScope($scope.editingBumperIndex).init();
-					}, function(e) {
-						console.log(e);
-					});
-				});
-			};
-			
-			reader.readAsArrayBuffer($scope.editingBumper.file);
-
+			fileSystem.writeFileInput(filename, $scope.editingBumper.file, "audio/mpeg").then(function() {
+				$scope.getBumperScope($scope.editingBumperIndex).init();
+			});
 		}
 		
 		$scope.editingBumper = {};

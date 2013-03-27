@@ -10,10 +10,10 @@ Implement UI for displaying play status per bumper
 --Different colors/indicators for background and looping tracks
 
 Extend bumper edit UI
-
-Implement loading bumper source from File Selection API (also look at Drag & Drop support)
+--Implement Drag & Drop for loading bumper source
 
 Implement as Chrome App (with offline support)
+--Might just use AppCache instead
 
 Fix issue where clicking Edit also starts the bumper
 

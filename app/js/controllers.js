@@ -384,7 +384,7 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 	//start playback of next track if one is defined in the bumper
 	//TODO: refactor to use Web Audio API's native scheduling instead of imprecise browser timeouts
 	$scope.goToNextTrack = function() {
-		if(typeof $scope.bumper.goTo !== "undefined" && $scope.bumper.goTo !== -1) {
+		if(typeof $scope.bumper.goTo !== "undefined" && $scope.bumper.goTo != -1) {
 			$timeout(function() {
 				$scope.getBumperScope($scope.bumper.goTo).startTrack();
 			}, (typeof $scope.bumper.goToDelay == "undefined" ? 0 : $scope.bumper.goToDelay*1000));

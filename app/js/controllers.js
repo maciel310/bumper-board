@@ -12,6 +12,8 @@ Implement UI for displaying play status per bumper
 Extend bumper edit UI
 --Implement Drag & Drop for loading bumper source
 
+Look in to using Angular-UI to replace current dialog implementation
+
 Implement as Chrome App (with offline support)
 --Might just use AppCache instead
 

@@ -15,8 +15,6 @@ Extend bumper edit UI
 Implement as Chrome App (with offline support)
 --Might just use AppCache instead
 
-Fix issue where clicking Edit also starts the bumper
-
 Should a board-sharing feature be implemented? Would need a way of transferring tracks and config in one package
 --look at jszip to generate/load a single zip file for sharing
 --could possibly use cloud storage APIs (dropbox, Google Drive, etc)
@@ -122,7 +120,10 @@ controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', '
 		}
 	};
 	
-	$scope.editBumper = function(b) {
+	$scope.editBumper = function(b, $event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		
 		var props = ["label", "filename", "trackStart", "fadeIn", "background", "loop", "loopStart", "loopEnd", "volume", "goTo", "goToDelay"];
 		$scope.editingBumper = {};
 		for(var i in props) {

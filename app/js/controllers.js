@@ -3,26 +3,6 @@
 /*globals angular,webkitAudioContext,console*/
 /*jshint newcap: false */
 
-/*
-TODO:
-
-Implement UI for displaying play status per bumper
---Different colors/indicators for background and looping tracks
-
-Extend bumper edit UI
---Implement Drag & Drop for loading bumper source
-
-Look in to using Angular-UI to replace current dialog implementation
-
-Implement as Chrome App (with offline support)
---Might just use AppCache instead
-
-Should a board-sharing feature be implemented? Would need a way of transferring tracks and config in one package
---look at jszip to generate/load a single zip file for sharing
---could possibly use cloud storage APIs (dropbox, Google Drive, etc)
---ideally should not rely on server-side code
-*/
-
 var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem']);
 
 controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', 'fileSystem', function BoardCtrl($scope, $http, $timeout, $q, fileSystem) {

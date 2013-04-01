@@ -3,7 +3,7 @@
 /*globals angular,webkitAudioContext,console*/
 /*jshint newcap: false */
 
-var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem']);
+var controllerModule = angular.module('bumperBoard.controllers', ['bumperBoard.services', 'fileSystem', 'ui.bootstrap']);
 
 controllerModule.controller('BoardCtrl', ['$scope', '$http', '$timeout', '$q', 'fileSystem', function BoardCtrl($scope, $http, $timeout, $q, fileSystem) {
 	$scope.audioContext = new webkitAudioContext();

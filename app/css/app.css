@@ -75,7 +75,11 @@ html, body {
 }
 
 .playing-true {
-	background: #00ff40;
+	background: #0059ff;
+}
+
+.background-true.playing-true {
+	background: #8dedfe !important;
 }
 
 #controls {

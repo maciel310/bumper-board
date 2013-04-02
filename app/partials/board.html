@@ -4,7 +4,8 @@
 
 <div id='board'>
 	<div ng-controller='BumperCtrl' ng-repeat="bumper in board.bumpers" ng-click='startTrack()' 
-			class='bumper playing-{{bumper.playing}}' id="bumper-{{$index}}"
+			id="bumper-{{$index}}"
+			class='bumper playing-{{bumper.playing}} background-{{bumper.background}} loop-{{bumper.loop}}' 
 			style='width:{{95/board.cols | number:0}}%; height:{{95/board.rows | number:0}}%'>
 		{{bumper.label}}
 		

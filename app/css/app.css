@@ -75,13 +75,31 @@ html, body {
 }
 
 .playing-true {
-	background: #0059ff;
+	background: #44d1fb;
 }
 
 .background-true.playing-true {
 	background: #8dedfe !important;
 }
 
+.loop-true.playing-true {
+	-webkit-animation-duration: 2s;
+	-webkit-animation-name: loopanimate;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-iteration-count: infinite;
+}
+
 #controls {
 	margin: 0;
+}
+
+
+@-webkit-keyframes loopanimate {
+	from {
+		background-color: #44d1fb;
+	}
+	
+	to {
+		background-color: #8dedfe;
+	}
 }

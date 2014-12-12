@@ -324,7 +324,7 @@ controllerModule.controller('BumperCtrl', ['$scope', '$http', '$timeout', 'audio
 	
 	$scope.play = function() {
 		var source = $scope.audioContext.createBufferSource();
-		var gain = $scope.audioContext.createGainNode();
+		var gain = $scope.audioContext.createGain();
 		
 		source.buffer = $scope.bumper.buffer;
 		source.connect(gain);
